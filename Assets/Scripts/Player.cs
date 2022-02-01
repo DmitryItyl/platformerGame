@@ -66,4 +66,12 @@ public class Player : MonoBehaviour
 
         animator.SetFloat("xVelocity", Mathf.Abs(body.velocity.x));
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Coins"))
+        {
+            Destroy(collision.gameObject);
+        }
+    }
 }
