@@ -1,15 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     //Public Fields
-    [SerializeField] float speed;
-    [SerializeField] float jumpPower;
+    [SerializeField] float speed = 2f;
+    [SerializeField] float jumpPower = 1100f;
 
     [SerializeField] Transform groundCheckCollider;
     [SerializeField] LayerMask groundLayer;
+
+    //Respawn & checkpoint
+    [SerializeField] Transform respawnPoint;
+    [SerializeField] Transform checkpoint;
+    private Transform currentSpawnPoint;
+    private bool checkPointMade = false;
 
     // Private Fields
     Rigidbody2D body;
@@ -25,10 +33,14 @@ public class Player : MonoBehaviour
     bool facingRight = true;
     bool isJumping = false;
 
+    public Image[] lives;
+    public int livesRemaining;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        currentSpawnPoint = respawnPoint;
     }
 
     private void Update()
@@ -118,6 +130,41 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Coins"))
         {
             Destroy(collision.gameObject);
+        }
+
+        if ((collision.gameObject.CompareTag("Checkpoint")) && !checkPointMade)
+        {
+            currentSpawnPoint = checkpoint;
+            checkPointMade = true;
+
+            Animator checkpointAnimator = checkpoint.GetComponent<Animator>();
+            checkpointAnimator.SetBool("Checked", true);
+        }
+
+        if (collision.gameObject.CompareTag("FallZone"))
+        {
+            LoseLife();
+        }
+
+        if (collision.gameObject.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            checkPointMade = false;
+        }
+    }
+
+    public void LoseLife()
+    {
+        livesRemaining--;
+        lives[livesRemaining].enabled = false;
+
+        if (livesRemaining == 0)
+        {
+            SceneManager.LoadScene(0);
+        }
+        else 
+        {
+            transform.position = currentSpawnPoint.position;
         }
     }
 }

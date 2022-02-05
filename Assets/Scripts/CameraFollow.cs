@@ -25,8 +25,6 @@ public class CameraFollow : MonoBehaviour
 
         maxValue.x -= Camera.main.orthographicSize * Screen.width / Screen.height;
         maxValue.y -= Camera.main.orthographicSize;
-        Debug.Log(minValue.y);
-        Debug.Log(maxValue.y);
     }
 
     private void FixedUpdate()
