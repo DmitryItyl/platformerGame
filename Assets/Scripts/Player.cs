@@ -6,10 +6,11 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    //Public Fields
+    //Player movement stats
     [SerializeField] float speed = 2f;
     [SerializeField] float jumpPower = 1100f;
 
+    //Ground check for jumping utility
     [SerializeField] Transform groundCheckCollider;
     [SerializeField] LayerMask groundLayer;
 
@@ -19,20 +20,25 @@ public class Player : MonoBehaviour
     private Transform currentSpawnPoint;
     private bool checkPointMade = false;
 
-    // Private Fields
+    //Player objects
     Rigidbody2D body;
     Animator animator;
 
+    //Pre-determined values 
     const float groundCheckRadius = 0.2f;
     float playerScale = 3f;
     float walkSpeedModifier = 0.5f;
+    
+    //Movement utility value
     float horizontalValue;
 
+    //Flags
     [SerializeField] bool isGrounded;
     bool isWalking = false;
     bool facingRight = true;
     bool isJumping = false;
 
+    // Life counter
     public Image[] lives;
     public int livesRemaining;
 
@@ -45,8 +51,10 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        // Unity "Horizontal" controls for walking (arrow keys and AD)
         horizontalValue = Input.GetAxisRaw("Horizontal");
 
+        // Left shift to walk slower
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             isWalking = true;
@@ -56,6 +64,7 @@ public class Player : MonoBehaviour
             isWalking = false;
         }
 
+        // Unity "Jump" controls to jump
         if (Input.GetButtonDown("Jump"))
         {
             animator.SetBool("Jump", true);
@@ -66,6 +75,7 @@ public class Player : MonoBehaviour
             isJumping = false;
         }
 
+        //Determining if character should use jumping or falling animation
         animator.SetFloat("yVelocity", body.velocity.y);
     }
 
@@ -77,8 +87,10 @@ public class Player : MonoBehaviour
 
     void GroundCheck()
     {
+        //Check if any objects in the "Ground" layer collide with players ground checking collider
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheckCollider.position, groundCheckRadius, groundLayer);
         
+        //False by default
         isGrounded = false;
         if (colliders.Length > 0)
             isGrounded = true;
@@ -127,12 +139,16 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        //Getting collectables
         if (collision.gameObject.CompareTag("Coins"))
         {
-            Destroy(collision.gameObject);
+            ScoreManager.AddCoinScore();
+            
+            collision.gameObject.SetActive(false);
         }
 
-        if ((collision.gameObject.CompareTag("Checkpoint")) && !checkPointMade)
+        //Making a checkpoint
+        else if ((collision.gameObject.CompareTag("Checkpoint")) && !checkPointMade)
         {
             currentSpawnPoint = checkpoint;
             checkPointMade = true;
@@ -141,12 +157,14 @@ public class Player : MonoBehaviour
             checkpointAnimator.SetBool("Checked", true);
         }
 
-        if (collision.gameObject.CompareTag("FallZone"))
+        //Death on falling off below the ground
+        else if (collision.gameObject.CompareTag("FallZone"))
         {
             LoseLife();
         }
 
-        if (collision.gameObject.CompareTag("Finish"))
+        //Making it to the end of the level, goint to the next level
+        else if (collision.gameObject.CompareTag("Finish"))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             checkPointMade = false;
@@ -155,12 +173,15 @@ public class Player : MonoBehaviour
 
     public void LoseLife()
     {
+        //Handling UI "lives" elements
         livesRemaining--;
         lives[livesRemaining].enabled = false;
 
+        //Respawn player or end game
         if (livesRemaining == 0)
         {
             SceneManager.LoadScene(0);
+            ScoreManager.ResetScore();
         }
         else 
         {
