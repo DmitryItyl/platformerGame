@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour
 {
@@ -42,6 +43,9 @@ public class Player : MonoBehaviour
     public Image[] lives;
     public int livesRemaining;
 
+    // Score displayer
+    public Text scoreText;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -52,9 +56,9 @@ public class Player : MonoBehaviour
     private void Update()
     {
         // Unity "Horizontal" controls for walking (arrow keys and AD)
-        horizontalValue = Input.GetAxisRaw("Horizontal");
+        horizontalValue = CrossPlatformInputManager.GetAxisRaw("Horizontal");
 
-        // Left shift to walk slower
+        // Left shift to walk slower (not avialable on mobile devices)
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             isWalking = true;
@@ -64,13 +68,12 @@ public class Player : MonoBehaviour
             isWalking = false;
         }
 
-        // Unity "Jump" controls to jump
-        if (Input.GetButtonDown("Jump"))
+        if (CrossPlatformInputManager.GetButtonDown("Jump"))
         {
             animator.SetBool("Jump", true);
             isJumping = true;
         }
-        else if (Input.GetButtonUp("Jump"))
+        else if (CrossPlatformInputManager.GetButtonUp("Jump"))
         {
             isJumping = false;
         }
@@ -143,7 +146,8 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Coins"))
         {
             ScoreManager.AddCoinScore();
-            
+            scoreText.text = "Score: " + ScoreManager.totalScore;
+
             collision.gameObject.SetActive(false);
         }
 

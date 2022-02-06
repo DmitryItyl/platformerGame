@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class ScoreManager : MonoBehaviour
 {
@@ -11,7 +13,6 @@ public class ScoreManager : MonoBehaviour
     public static void AddCoinScore()
     {
         totalScore += coinValue;
-        Debug.Log(totalScore);
     }
 
     public static void ResetScore()

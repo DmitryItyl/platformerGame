@@ -17,8 +17,6 @@ public class CameraFollow : MonoBehaviour
         Bounds bound = level.localBounds;
         minValue = bound.min;
         maxValue = bound.max;
-        Debug.Log(minValue.y);
-        Debug.Log(maxValue.y);
 
         minValue.x += Camera.main.orthographicSize * Screen.width / Screen.height;
         minValue.y += Camera.main.orthographicSize;
