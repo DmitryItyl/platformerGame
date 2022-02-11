@@ -55,8 +55,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // Unity "Horizontal" controls for walking (arrow keys and AD)
-        horizontalValue = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+
 
         // Left shift to walk slower (not avialable on mobile devices)
         if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -68,6 +67,9 @@ public class Player : MonoBehaviour
             isWalking = false;
         }
 
+        #region Android movement using UI buttons
+        horizontalValue = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+
         if (CrossPlatformInputManager.GetButtonDown("Jump"))
         {
             animator.SetBool("Jump", true);
@@ -77,6 +79,21 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
         }
+        #endregion
+
+        #region Windows movement using keyboard (for debugging)
+        horizontalValue = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetButtonDown("Jump"))
+        {
+            animator.SetBool("Jump", true);
+            isJumping = true;
+        }
+        else if (Input.GetButtonUp("Jump"))
+        {
+            isJumping = false;
+        }
+        #endregion
 
         //Determining if character should use jumping or falling animation
         animator.SetFloat("yVelocity", body.velocity.y);

@@ -18,6 +18,13 @@ public class Menu : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        //Unpause game in case function was called from pause menu
+        if (isPaused)
+        {
+            Time.timeScale = 1f;
+            isPaused = false;
+        }
+
         SceneManager.LoadScene("MainMenu");
     }
 
