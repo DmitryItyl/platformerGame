@@ -18,5 +18,6 @@ public class ScoreManager : MonoBehaviour
     public static void ResetScore()
     {
         totalScore = 0;
+        PlayerPrefs.SetInt("Score", 0);
     }
 }

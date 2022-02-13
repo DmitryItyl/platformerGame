@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4800283735977980}
   - component: {fileID: 8195094282780020180}
   - component: {fileID: 3664157345405129722}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Layer1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2668,7 +2668,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4136452614651496}
   - component: {fileID: 2569400267027410764}
-  m_Layer: 31
+  m_Layer: 3
   m_Name: Medieval_pixel_art_tileset_free
   m_TagString: Untagged
   m_Icon: {fileID: 0}

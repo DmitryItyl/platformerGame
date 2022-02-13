@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     //Respawn & checkpoint
     [SerializeField] Transform respawnPoint;
     [SerializeField] Transform checkpoint;
+    [SerializeField] GameObject gameOverScreen;
     private Transform currentSpawnPoint;
     private bool checkPointMade = false;
 
@@ -53,11 +54,14 @@ public class Player : MonoBehaviour
         currentSpawnPoint = respawnPoint;
     }
 
+    private void Start()
+    {
+        scoreText.text = "Score: " + ScoreManager.totalScore;
+    }
+
     private void Update()
     {
-
-
-        // Left shift to walk slower (not avialable on mobile devices)
+        // Left shift to walk slower (not avialable on mobile devices)      
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             isWalking = true;
@@ -81,7 +85,8 @@ public class Player : MonoBehaviour
         }
         #endregion
 
-        #region Windows movement using keyboard (for debugging)
+
+        #region Windows movement using keyboard (for playtesting)
         horizontalValue = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetButtonDown("Jump"))
@@ -159,36 +164,44 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Getting collectables
-        if (collision.gameObject.CompareTag("Coins"))
+        switch (collision.gameObject.tag)
         {
-            ScoreManager.AddCoinScore();
-            scoreText.text = "Score: " + ScoreManager.totalScore;
+            //If collide with coins: add score, update score prompt, remove coin from the playfield
+            case "Coins":
+                ScoreManager.AddCoinScore();
+                scoreText.text = "Score: " + ScoreManager.totalScore;
+                collision.gameObject.SetActive(false);
+                break;
 
-            collision.gameObject.SetActive(false);
-        }
+            //Make checkpoint (one checkpoint per level so only do something if checkpoint isn't made)
+            case "Checkpoint":
+                if (!checkPointMade)
+                {
+                    currentSpawnPoint = checkpoint;
+                    checkPointMade = true;
+                    Animator checkpointAnimator = checkpoint.GetComponent<Animator>();
+                    checkpointAnimator.SetBool("Checked", true);
+                }
+                break;
+ 
+            case "FallZone":
+                LoseLife();
+                break;
 
-        //Making a checkpoint
-        else if ((collision.gameObject.CompareTag("Checkpoint")) && !checkPointMade)
-        {
-            currentSpawnPoint = checkpoint;
-            checkPointMade = true;
+            //Making it to the end of the level, goint to the next level, update score prompt on the new level
+            case "Finish":
+                int newLevel = SceneManager.GetActiveScene().buildIndex + 1;
 
-            Animator checkpointAnimator = checkpoint.GetComponent<Animator>();
-            checkpointAnimator.SetBool("Checked", true);
-        }
+                PlayerPrefs.SetInt("Score", ScoreManager.totalScore);
+                PlayerPrefs.SetInt("Level", newLevel);
 
-        //Death on falling off below the ground
-        else if (collision.gameObject.CompareTag("FallZone"))
-        {
-            LoseLife();
-        }
+                SceneManager.LoadScene(newLevel);
+                checkPointMade = false;
+            
+                break;
 
-        //Making it to the end of the level, goint to the next level
-        else if (collision.gameObject.CompareTag("Finish"))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            checkPointMade = false;
+            default:
+                break;
         }
     }
 
@@ -201,12 +214,20 @@ public class Player : MonoBehaviour
         //Respawn player or end game
         if (livesRemaining == 0)
         {
-            SceneManager.LoadScene(0);
-            ScoreManager.ResetScore();
+            GameOver();
         }
         else 
         {
             transform.position = currentSpawnPoint.position;
         }
+    }
+
+    public void GameOver()
+    {
+        ScoreManager.ResetScore();
+        PlayerPrefs.SetInt("Level", 1);
+        Time.timeScale = 0f;
+        Menu.isPaused = true;
+        gameOverScreen.SetActive(true);
     }
 }
