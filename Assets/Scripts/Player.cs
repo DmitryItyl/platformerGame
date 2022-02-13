@@ -87,6 +87,7 @@ public class Player : MonoBehaviour
 
 
         #region Windows movement using keyboard (for playtesting)
+        /*
         horizontalValue = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetButtonDown("Jump"))
@@ -98,6 +99,7 @@ public class Player : MonoBehaviour
         {
             isJumping = false;
         }
+        */
         #endregion
 
         //Determining if character should use jumping or falling animation
